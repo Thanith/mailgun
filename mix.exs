@@ -5,11 +5,11 @@ defmodule Mailgun.Mixfile do
     [app: :mailgun,
      version: "0.1.3",
      elixir: "~> 1.0",
-     deps: deps,
+     deps: deps(),
      package: [
-       contributors: ["Chris McCord"],
+       contributors: ["Chris McCord", "Thanith"],
        licenses: ["MIT"],
-       links: %{github: "https://github.com/chrismccord/mailgun"}
+       links: %{github: "https://github.com/Thanith/mailgun"}
      ],
      description: """
      Elixir Mailgun Client
