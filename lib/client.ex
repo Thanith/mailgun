@@ -115,6 +115,7 @@ defmodule Mailgun.Client do
   defp send_without_attachments(conf, email) do
     attrs = Dict.merge(email, %{
       to: Dict.fetch!(email, :to),
+      cc: Dict.get(email, :cc, ""),
       from: Dict.fetch!(email, :from),
       text: Dict.get(email, :text, ""),
       html: Dict.get(email, :html, ""),
@@ -130,6 +131,7 @@ defmodule Mailgun.Client do
       email
       |> Dict.merge(%{
         to: Dict.fetch!(email, :to),
+        cc: Dict.get(email, :cc, ""),
         from: Dict.fetch!(email, :from),
         text: Dict.get(email, :text, ""),
         html: Dict.get(email, :html, ""),
