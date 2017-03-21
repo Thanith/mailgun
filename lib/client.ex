@@ -122,10 +122,7 @@ defmodule Mailgun.Client do
         text: Dict.get(email, :text, ""),
         html: Dict.get(email, :html, ""),
         subject: Dict.get(email, :subject, "")})
-      |> Enum.filter_map(fn {k, v} -> !is_nil(v) and String.strip(v) != "" end, fn
-        {k, v} when is_binary(v) -> {k, String.to_char_list(v)}
-        {k, v} -> {k, v}
-      end)
+      |> Enum.filter(fn {k, v} -> !is_nil(v) and String.strip(v) != "" end)
       |> Enum.into(%{})
 
     ctype   = 'application/x-www-form-urlencoded'
