@@ -113,14 +113,21 @@ defmodule Mailgun.Client do
     end
   end
   defp send_without_attachments(conf, email) do
-    attrs = Dict.merge(email, %{
-      to: Dict.fetch!(email, :to),
-      cc: Dict.get(email, :cc, ""),
-      from: Dict.fetch!(email, :from),
-      text: Dict.get(email, :text, ""),
-      html: Dict.get(email, :html, ""),
-      subject: Dict.get(email, :subject, ""),
-    })
+    attrs =
+      email
+      |> Dict.merge(%{
+        to: Dict.fetch!(email, :to),
+        from: Dict.fetch!(email, :from),
+        cc: Dict.get(email, :cc, ""),
+        text: Dict.get(email, :text, ""),
+        html: Dict.get(email, :html, ""),
+        subject: Dict.get(email, :subject, "")})
+      |> Enum.filter_map(fn {k, v} -> !is_nil(v) and String.strip(v) != "" end, fn
+        {k, v} when is_binary(v) -> {k, String.to_char_list(v)}
+        {k, v} -> {k, v}
+      end)
+      |> Enum.into(%{})
+
     ctype   = 'application/x-www-form-urlencoded'
     body    = URI.encode_query(Dict.drop(attrs, [:attachments]))
 
@@ -131,12 +138,12 @@ defmodule Mailgun.Client do
       email
       |> Dict.merge(%{
         to: Dict.fetch!(email, :to),
-        cc: Dict.get(email, :cc, ""),
         from: Dict.fetch!(email, :from),
+        cc: Dict.get(email, :cc, ""),
         text: Dict.get(email, :text, ""),
         html: Dict.get(email, :html, ""),
         subject: Dict.get(email, :subject, "")})
-      |> Enum.map(fn
+      |> Enum.filter_map(fn {k, v} -> !is_nil(v) and String.strip(v) != "" end, fn
         {k, v} when is_binary(v) -> {k, String.to_char_list(v)}
         {k, v} -> {k, v}
       end)
@@ -155,6 +162,8 @@ defmodule Mailgun.Client do
     body = format_multipart_formdata(boundary, attrs, attachments)
 
     headers = [{'Content-Length', :erlang.integer_to_list(:erlang.length(attachments))} | headers]
+
+    IO.inspect body
 
     request(conf, :post, url("/messages", conf[:domain]), "api", conf[:key], headers, ctype, body)
   end
@@ -186,6 +195,7 @@ defmodule Mailgun.Client do
     end)
     file_parts2 = :lists.append(file_parts)
     ending_parts = [:lists.concat(['--', boundary, '--']), '']
+
     parts = :lists.append([field_parts2, file_parts2, ending_parts])
 
     :string.join(parts, '\r\n')
