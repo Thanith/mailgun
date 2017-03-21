@@ -163,8 +163,6 @@ defmodule Mailgun.Client do
 
     headers = [{'Content-Length', :erlang.integer_to_list(:erlang.length(attachments))} | headers]
 
-    IO.inspect body
-
     request(conf, :post, url("/messages", conf[:domain]), "api", conf[:key], headers, ctype, body)
   end
 
