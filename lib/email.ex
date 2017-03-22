@@ -21,7 +21,7 @@ defmodule Mailgun.Email do
       text: nil,
       attachments: nil
 
-  alias Booking.Mail.Email
+  alias Mailgun.Email
 
   @spec new_email(Enum.t) :: __MODULE__.t
   def new_email(attrs \\ []) do
